@@ -10,7 +10,7 @@ type Task struct {
 
 func (t Task) String() string {
 	var isDoneEmoji string
-	if t.Done == true {
+	if t.Done {
 		isDoneEmoji = "✔️"
 	} else {
 		isDoneEmoji = "❌"

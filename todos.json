@@ -1,12 +1,32 @@
 [
   {
     "id": 1,
+    "title": "Talk about chickens with AI",
+    "done": true
+  },
+  {
+    "id": 2,
     "title": "Make a Todo App with Go",
     "done": false
   },
   {
-    "id": 2,
-    "title": "Talk about chickens with AI",
+    "id": 3,
+    "title": "Get ready to get back to work",
+    "done": false
+  },
+  {
+    "id": 4,
+    "title": "Feed the chickens",
+    "done": true
+  },
+  {
+    "id": 5,
+    "title": "Shave a beard",
+    "done": false
+  },
+  {
+    "id": 6,
+    "title": "Randomnonstring",
     "done": false
   }
 ]

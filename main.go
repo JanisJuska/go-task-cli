@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/JanisJuska/Go-task-cli/task"
@@ -43,6 +44,34 @@ func main() {
 		}
 
 		fmt.Println()
+	case "done":
+		id, err := strconv.Atoi(argString)
+		if err != nil {
+			log.Fatalf("Cannot convert string to number due to: %v\n", err)
+		}
+
+		var taskTitle string
+
+		for i, t := range tasks {
+			if t.ID == uint(id) {
+				t.Done = true
+
+				taskTitle = t.Title
+
+				tasks[i] = t
+			}
+		}
+
+		fileData := openAndReadFile("todos.json")
+
+		err = os.WriteFile("todos.json", fileData, 0644)
+		if err != nil {
+			log.Fatalf("Cannot write to file due to: %v\n", err)
+		}
+
+		fmt.Printf("'%v' task marked as Done ✔️\n", taskTitle)
+	default:
+		log.Fatalf("No argument passed.\n")
 	}
 
 }
@@ -50,27 +79,16 @@ func main() {
 func addNewTaskToJSON(newTask task.Task, filename string) []task.Task {
 
 	tasksList := returnListFromFile(filename)
-	dataFile, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0644)
-	if err != nil {
-		log.Fatalf("Cannot open the file due to: %v\n", err)
-	}
-	fileData, err := os.ReadFile(filename)
-	if err != nil {
-		log.Fatalf("Cannot read the file due to: %v\n", err)
-	}
-
-	defer dataFile.Close()
+	fileData := openAndReadFile(filename)
 
 	tasksList = append(tasksList, newTask)
 
-	fileData, err = json.MarshalIndent(tasksList, "", "  ")
+	fileData, err := json.MarshalIndent(tasksList, "", "  ")
 	if err != nil {
 		log.Fatalf("Cannot Marshal file due to: %v\n", err)
 	}
 
-	fmt.Printf("fileData: %v\n", string(fileData))
-
-	_, err = dataFile.Write(fileData)
+	err = os.WriteFile(filename, fileData, 0644)
 	if err != nil {
 		log.Fatalf("Cannot write to file due to: %v\n", err)
 	}
@@ -80,6 +98,15 @@ func addNewTaskToJSON(newTask task.Task, filename string) []task.Task {
 }
 
 func returnListFromFile(filename string) []task.Task {
+	fileData := openAndReadFile(filename)
+
+	var tasksList []task.Task
+	json.Unmarshal(fileData, &tasksList)
+
+	return tasksList
+}
+
+func openAndReadFile(filename string) []byte {
 	dataFile, err := os.OpenFile(filename, os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Fatalf("Cannot open the file due to: %v\n", err)
@@ -91,8 +118,5 @@ func returnListFromFile(filename string) []task.Task {
 
 	defer dataFile.Close()
 
-	var tasksList []task.Task
-	json.Unmarshal(fileData, &tasksList)
-
-	return tasksList
+	return fileData
 }
